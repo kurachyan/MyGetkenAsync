@@ -72,7 +72,7 @@ namespace GetkenAsync
         #endregion
 
         #region コンストラクタ
-        public CS_Getken()
+        public CS_GetkenAsync()
         {   // コンストラクタ
             _wbuf = null;       // 設定情報無し
             _empty = true;
@@ -83,7 +83,7 @@ namespace GetkenAsync
         #endregion
 
         #region モジュール
-        public void Clear()
+        public async Task Clear()
         {   // 作業領域の初期化
             _wbuf = null;       // 設定情報無し
             _empty = true;
@@ -91,7 +91,7 @@ namespace GetkenAsync
             rskip = null;
             lskip = null;
         }
-        public void Exec()
+        public async Task Exec()
         {   // Token抽出（固定区切り）
             if (!_empty)
             {   // バッファーに実装有り
@@ -99,7 +99,7 @@ namespace GetkenAsync
                 _wcnt = Array.Count<String>();      // 要素数取り出し
             }
         }
-        public void Exec(char[] __trim)
+        public async Task Exec(char[] __trim)
         {   // Token抽出（指定区切り）
             if (!_empty)
             {   // バッファーに実装有り
