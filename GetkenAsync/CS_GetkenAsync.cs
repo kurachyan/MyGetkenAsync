@@ -38,9 +38,9 @@ namespace GetkenAsync
                         lskip = new CS_LskipAsync();
                     }
                     rskip.Wbuf = _wbuf;
-                    rskip.Exec();
+                    rskip.ExecAsync();
                     lskip.Wbuf = rskip.Wbuf;
-                    lskip.Exec();
+                    lskip.ExecAsync();
                     _wbuf = lskip.Wbuf;
 
                     // 作業の為の下処理
@@ -83,7 +83,7 @@ namespace GetkenAsync
         #endregion
 
         #region モジュール
-        public async Task Clear()
+        public async Task ClearAsync()
         {   // 作業領域の初期化
             _wbuf = null;       // 設定情報無し
             _empty = true;
@@ -91,7 +91,8 @@ namespace GetkenAsync
             rskip = null;
             lskip = null;
         }
-        public async Task Exec()
+
+        public async Task ExecAsync()
         {   // Token抽出（固定区切り）
             if (!_empty)
             {   // バッファーに実装有り
@@ -99,12 +100,67 @@ namespace GetkenAsync
                 _wcnt = Array.Count<String>();      // 要素数取り出し
             }
         }
-        public async Task Exec(char[] __trim)
+        public async Task ExecAsync(String msg)
+        {   // Token抽出（固定区切り）
+            await SetbufAsync(msg);                 // 入力内容の作業領域設定
+
+            if (!_empty)
+            {   // バッファーに実装有り
+                Array = _wbuf.Split(_trim);         // トークン抽出
+                _wcnt = Array.Count<String>();      // 要素数取り出し
+            }
+        }
+        public async Task ExecAsync(char[] __trim)
         {   // Token抽出（指定区切り）
             if (!_empty)
             {   // バッファーに実装有り
                 Array = _wbuf.Split(__trim);
                 _wcnt = Array.Count<String>();
+            }
+        }
+        public async Task ExecAsync(String msg, char[] __trim)
+        {   // Token抽出（指定区切り）
+            await SetbufAsync(msg);                 // 入力内容の作業領域設定
+
+            if (!_empty)
+            {   // バッファーに実装有り
+                Array = _wbuf.Split(__trim);
+                _wcnt = Array.Count<String>();
+            }
+        }
+
+        private async Task SetbufAsync(String _strbuf)
+        {   // [_wbuf]情報設定
+            _wbuf = _strbuf;
+
+            if (_wbuf == null)
+            {   // 設定情報は無し？
+                _empty = true;
+            }
+            else
+            {   // 整形処理を行う
+                // 不要情報削除
+                if (rskip == null || lskip == null)
+                {   // 未定義？
+                    rskip = new CS_RskipAsync();
+                    lskip = new CS_LskipAsync();
+                }
+                rskip.Wbuf = _wbuf;
+                await rskip.ExecAsync();
+                lskip.Wbuf = rskip.Wbuf;
+                await lskip.ExecAsync();
+                _wbuf = lskip.Wbuf;
+
+                // 作業の為の下処理
+                if (_wbuf.Length == 0 || _wbuf == null)
+                {   // バッファー情報無し
+                    // _wbuf = null;
+                    _empty = true;
+                }
+                else
+                {
+                    _empty = false;
+                }
             }
         }
         #endregion
