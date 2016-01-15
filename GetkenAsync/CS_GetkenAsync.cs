@@ -10,8 +10,8 @@ namespace GetkenAsync
     public class CS_GetkenAsync
     {
         #region 共有領域
-        CS_RskipAsync rskip;             // 右側余白情報を削除
-        CS_LskipAsync lskip;             // 左側余白情報を削除
+        // '16.01.13 両側余白情報削除の追加　及び、右側・左側余白処理のコメント化
+        CS_LRskipAsync lrskip;           // 両側余白情報を削除
 
         private String _wbuf;       // ソース情報
         private Boolean _empty;     // ソース情報有無
@@ -32,16 +32,12 @@ namespace GetkenAsync
                 else
                 {   // 整形処理を行う
                     // 不要情報削除
-                    if (rskip == null || lskip == null)
+                    if (lrskip == null)
                     {   // 未定義？
-                        rskip = new CS_RskipAsync();
-                        lskip = new CS_LskipAsync();
+                        lrskip = new CS_LRskipAsync();
                     }
-                    rskip.Wbuf = _wbuf;
-                    rskip.ExecAsync();
-                    lskip.Wbuf = rskip.Wbuf;
-                    lskip.ExecAsync();
-                    _wbuf = lskip.Wbuf;
+                    lrskip.ExecAsync(_wbuf);
+                    _wbuf = lrskip.Wbuf;
 
                     // 作業の為の下処理
                     if (_wbuf.Length == 0 || _wbuf == null)
@@ -77,8 +73,7 @@ namespace GetkenAsync
             _wbuf = null;       // 設定情報無し
             _empty = true;
 
-            rskip = null;
-            lskip = null;
+            lrskip = null;
         }
         #endregion
 
@@ -88,8 +83,7 @@ namespace GetkenAsync
             _wbuf = null;       // 設定情報無し
             _empty = true;
 
-            rskip = null;
-            lskip = null;
+            lrskip = null;
         }
 
         public async Task ExecAsync()
@@ -140,16 +134,12 @@ namespace GetkenAsync
             else
             {   // 整形処理を行う
                 // 不要情報削除
-                if (rskip == null || lskip == null)
+                if (lrskip == null)
                 {   // 未定義？
-                    rskip = new CS_RskipAsync();
-                    lskip = new CS_LskipAsync();
+                    lrskip = new CS_LRskipAsync();
                 }
-                rskip.Wbuf = _wbuf;
-                await rskip.ExecAsync();
-                lskip.Wbuf = rskip.Wbuf;
-                await lskip.ExecAsync();
-                _wbuf = lskip.Wbuf;
+                await lrskip.ExecAsync(_wbuf);
+                _wbuf = lrskip.Wbuf;
 
                 // 作業の為の下処理
                 if (_wbuf.Length == 0 || _wbuf == null)
@@ -165,4 +155,6 @@ namespace GetkenAsync
         }
         #endregion
     }
+    //  FIXME : Splitを使用すると、区切り情報も要素として見る。
+    //          区切り情報単体は排除する処理も追加する。
 }
